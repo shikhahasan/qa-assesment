@@ -10,7 +10,7 @@
     "test:q3": "playwright test --grep @q3",
     "test:q4": "playwright test --grep @q4",
     "test:headed": "playwright test --headed",
-    "report:html": "playwright show-report playwright-report",
+    "report:html": "playwright show-report reports/playwright-report",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
