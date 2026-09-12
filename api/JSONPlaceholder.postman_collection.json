@@ -1,0 +1,106 @@
+{
+  "info": {
+    "_postman_id": "48f6a62c-aa95-422c-8cc1-82f7f8d28609",
+    "name": "JSONPlaceholder API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "14750921"
+  },
+  "item": [
+    {
+      "name": "GET All Users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst users = pm.response.json();\n\npm.test(\"Response contains user data\", function () {\n    pm.expect(users).to.be.an(\"array\");\n    pm.expect(users.length).to.be.greaterThan(0);\n});\n\npm.test(\"Each user has id, name and email\", function () {\n    users.forEach(function (user) {\n        pm.expect(user).to.have.property(\"id\");\n        pm.expect(user).to.have.property(\"name\");\n        pm.expect(user).to.have.property(\"email\");\n    });\n});\n\n// Extract and store user ID\nconst userId = users[0].id;\npm.collectionVariables.set(\"userId\", userId);\n\n// Store the complete user object\npm.collectionVariables.set(\n    \"userObject\",\n    JSON.stringify(users[0])\n);\n\nconsole.log(\"Stored User ID:\", userId);\nconsole.log(\"Stored User Object:\", users[0]);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Update User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const randomNumber = Date.now();\n\nconst userObject = JSON.parse(\n    pm.collectionVariables.get(\"userObject\")\n);\n\nuserObject.name = `Updated User ${randomNumber}`;\nuserObject.email = `updated.${randomNumber}@example.com`;\nuserObject.company.name = `Updated Company ${randomNumber}`;\n\npm.variables.set(\"requestBody\", JSON.stringify(userObject));\n\nconsole.log(\"Request Body:\", userObject);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst response = pm.response.json();\nconst storedId = pm.collectionVariables.get(\"userId\");\n\npm.test(\"Returned ID matches stored ID\", function () {\n    pm.expect(response.id).to.eql(Number(storedId));\n});\n\npm.test(\"Phone field is not empty\", function () {\n    pm.expect(response.phone).to.exist;\n    pm.expect(response.phone).to.not.be.empty;\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{{requestBody}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users/{{userId}}",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "userObject",
+      "value": ""
+    }
+  ]
+}

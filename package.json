@@ -11,7 +11,8 @@
     "test:q4": "playwright test --grep @q4",
     "test:headed": "playwright test --headed",
     "report:html": "playwright show-report reports/playwright-report",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:api": "node scripts/run-api.mjs"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,8 @@
     "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^22.20.2",
+    "newman": "^6.2.2",
+    "newman-reporter-htmlextra": "^1.23.1",
     "typescript": "^7.0.2"
   }
 }
