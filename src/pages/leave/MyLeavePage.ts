@@ -1,6 +1,5 @@
 import { expect, type Locator } from '@playwright/test';
 import { DataTable } from '../../components/DataTable';
-import { formatDate } from '../../utils/dates';
 import { exactText } from '../../utils/text';
 import { BasePage } from '../BasePage';
 
@@ -21,10 +20,7 @@ export class MyLeavePage extends BasePage {
   }
 
   async filter(opts: { from: Date; to: Date; statuses: LeaveStatus[] }) {
-    const pattern = await this.datePattern(this.fromDate);
-    await this.fromDate.fill(formatDate(opts.from, pattern));
-    await this.toDate.fill(formatDate(opts.to, pattern));
-    await this.title.click(); // close the date picker
+    await this.fillDateRange(this.fromDate, this.toDate, opts.from, opts.to, this.title);
     await this.setStatuses(opts.statuses);
     await this.clickAndWaitForApi(this.searchButton, '/api/v2/leave/leave-requests');
   }

@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page, type Response } from '@playwright/test';
 import { Sidebar } from '../components/Sidebar';
 import { TopBar } from '../components/TopBar';
+import { formatDate } from '../utils/dates';
 import { exactText } from '../utils/text';
 
 export abstract class BasePage {
@@ -12,6 +13,7 @@ export abstract class BasePage {
     this.topBar = new TopBar(page);
   }
 
+  /** An OrangeHRM form group (label + control), located by its visible label. */
   protected group(label: string): Locator {
     return this.page.locator('.oxd-input-group').filter({
       has: this.page.locator('label', { hasText: exactText(label) }),
@@ -45,7 +47,18 @@ export abstract class BasePage {
     await expect(this.page.locator('.oxd-toast-content-text', { hasText: message }).first()).toBeVisible();
   }
 
-  protected async datePattern(input: Locator): Promise<string> {
-    return (await input.getAttribute('placeholder')) || 'yyyy-mm-dd';
+  protected async fillDateRange(fromInput: Locator, toInput: Locator, from: Date, to: Date, blurTarget: Locator) {
+    const pattern = (await fromInput.getAttribute('placeholder')) || 'yyyy-mm-dd';
+    const fromText = formatDate(from, pattern);
+    const toText = formatDate(to, pattern);
+
+    await fromInput.fill(fromText);
+    await blurTarget.click();
+    await expect(async () => {
+      await toInput.fill(toText);
+      await blurTarget.click();
+      await expect(toInput).toHaveValue(toText, { timeout: 1_000 });
+    }).toPass({ timeout: 10_000 });
+    await expect(fromInput).toHaveValue(fromText);
   }
 }

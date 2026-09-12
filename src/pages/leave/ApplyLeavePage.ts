@@ -1,5 +1,4 @@
 import { expect } from '@playwright/test';
-import { formatDate } from '../../utils/dates';
 import { BasePage } from '../BasePage';
 
 export interface LeaveApplication {
@@ -23,13 +22,14 @@ export class ApplyLeavePage extends BasePage {
     await expect(this.title).toHaveText('Apply Leave');
   }
 
+  /**
+   * Submits the form. Returns whether OrangeHRM saved it, plus the message shown —
+   * callers retry with another date when the demo reports an overlap or a non-working day.
+   */
   async apply(leave: LeaveApplication): Promise<{ saved: boolean; message: string }> {
     await this.selectOption('Leave Type', leave.leaveType);
 
-    const pattern = await this.datePattern(this.fromDate);
-    await this.fromDate.fill(formatDate(leave.from, pattern));
-    await this.toDate.fill(formatDate(leave.to, pattern));
-    await this.title.click(); // close the date picker
+    await this.fillDateRange(this.fromDate, this.toDate, leave.from, leave.to, this.title);
     await this.comments.fill(leave.comment);
 
     await this.applyButton.click();
