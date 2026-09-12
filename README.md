@@ -3,6 +3,7 @@
 Automation tests for the QA assignment.
 
 - UI tests (Part A): OrangeHRM demo site, written with Playwright
+- Manual tests (Part B): test cases and bug reports in an Excel file
 - API tests (Part D): JSONPlaceholder users API, written in Postman and run with Newman
 
 Sites used:
@@ -28,10 +29,18 @@ npx playwright install chromium
 
 ## How to run
 
+Run everything together (UI first, then API):
+
 ```bash
-npm test             # run all 4 UI tests
-npm run test:q1      # run only Q1 (also test:q2, test:q3, test:q4)
-npm run test:api     # run the Postman collection
+npm run test:all
+```
+
+Run one part or one test only:
+
+```bash
+npm run test:ui      # all 4 UI tests
+npm run test:api     # only the API tests
+npm run test:q1      # only Q1 (also test:q2, test:q3, test:q4)
 npm run test:headed  # run UI tests in a visible browser
 ```
 
@@ -44,6 +53,9 @@ A report is created every time you run the tests, even if a test fails.
 
 If a UI test fails, the report also has a screenshot, a video and a trace file.
 
+Reports from a passing run are also saved in the repo, inside the `sample-reports/` folder, so you can
+see them without running the tests.
+
 ## Part A - UI test cases
 
 | Test | File | What it does |
@@ -54,6 +66,22 @@ If a UI test fails, the report also has a screenshot, a video and a trace file.
 | Q4 | `tests/q4-leave-apply-cancel.spec.ts` | Applies for leave, checks it shows as Pending Approval, cancels it and checks the status becomes Cancelled |
 
 Every test logs in by itself and makes its own data. So you can run one test alone or all of them together.
+
+## Part B - Manual test cases
+
+Folder: `manual-tests/`
+
+- `OrangeHRM_Manual_Test_Cases.xlsx` - 11 test cases for Login, PIM, Admin and Leave
+- `screenshots/` - the screenshots used in the bug reports
+
+The Excel file has these sheets:
+
+- **Login, PIM, Admin, Leave** - the test cases, with Test ID, Title, Preconditions, Steps, Expected Result, Actual Result, Status and Priority
+- **Traceability** - which module and feature every test checks, and which tests are already automated in Part A
+- **Bug Reports** - 4 bugs found while testing, with steps, expected vs actual, severity and a screenshot
+
+These manual cases check things the automation does not check, for example empty fields, unauthorized
+access after logout, very long input, numbers in name fields and SQL injection strings.
 
 ## Part D - API test cases
 
@@ -76,31 +104,16 @@ It has 2 requests and 6 checks:
 ## Folders
 
 ```
-api/         Postman collection
-scripts/     script that runs Newman and saves the report
+api/             Postman collection
+manual-tests/    manual test cases and bug report screenshots
+sample-reports/  reports from a passing run
+scripts/         run-api.mjs (Newman) and run-all.mjs (UI + API)
 src/
-  api/       small API client, only used to create and delete test data
-  components/  Sidebar, TopBar and DataTable (parts that are on every page)
-  config/    site URL and login details
-  fixtures/  page objects given to the tests
-  pages/     page objects
-  utils/     random data, date and text helpers
-tests/       the 4 test files
+  api/           small API client, only used to create and delete test data
+  components/    Sidebar, TopBar and DataTable (parts that are on every page)
+  config/        site URL and login details
+  fixtures/      page objects given to the tests
+  pages/         page objects
+  utils/         random data, date and text helpers
+tests/           the 4 test files
 ```
-
-## Why some things are done this way
-
-- Page Object Model: the locators are in the page files, the test files only have the steps and the checks.
-- `DataTable` finds a cell by the column name, not by the column number. So if the site adds a new column, the tests still work.
-- The demo site is public and everyone uses it. So Q3 creates its own user instead of editing the Admin user, and Q4 adds its own leave balance and picks a random date. Everything it creates is deleted after the test.
-- `workers: 1` in the config, because running tests together on the same site makes them change each other's data.
-- No `waitForTimeout`. The tests wait for the real API response instead.
-- The date format is read from the input placeholder, because this site uses `yyyy-dd-mm`.
-- In the PUT request I send the full user object and change only name, email and company name. This API sends back whatever you send it, so if I send only 3 fields there is no phone field in the response and the phone check cannot work.
-
-## If something fails
-
-- Tests time out: the demo site is slow sometimes, run them again.
-- `Leave could not be applied on 3 different date ranges`: someone else already took leave on those dates, run it again.
-- `Invalid credentials` in all tests: the demo site password changed, update `src/config/env.ts`.
-- `newman: command not found`: run `npm install` first.

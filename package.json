@@ -12,7 +12,9 @@
     "test:headed": "playwright test --headed",
     "report:html": "playwright show-report reports/playwright-report",
     "typecheck": "tsc --noEmit",
-    "test:api": "node scripts/run-api.mjs"
+    "test:api": "node scripts/run-api.mjs",
+    "test:all": "node scripts/run-all.mjs",
+    "test:ui": "playwright test"
   },
   "keywords": [],
   "author": "",
