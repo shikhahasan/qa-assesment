@@ -45,7 +45,7 @@ test.describe('Q3 - Admin: search a user, edit role & status', { tag: '@q3' }, (
       await systemUsersPage.searchByUsername(credentials.username);
       const rows = systemUsersPage.table.rows;
       await expect(rows).toHaveCount(1);
-      expect(await systemUsersPage.table.readRow(rows.first())).toMatchObject({
+      await expect.poll(() => systemUsersPage.table.readRow(rows.first())).toMatchObject({
         Username: credentials.username,
         'User Role': 'ESS',
         'Employee Name': employeeName,
@@ -67,7 +67,7 @@ test.describe('Q3 - Admin: search a user, edit role & status', { tag: '@q3' }, (
       await systemUsersPage.searchByUsername(credentials.username);
       const row = systemUsersPage.rowFor(credentials.username);
       await expect(row).toHaveCount(1);
-      expect(await systemUsersPage.table.readRow(row)).toMatchObject({
+      await expect.poll(() => systemUsersPage.table.readRow(row)).toMatchObject({
         Username: credentials.username,
         'User Role': 'Admin',
         Status: 'Disabled',

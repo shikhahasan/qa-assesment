@@ -39,7 +39,7 @@ test.describe('Q2 - PIM: add employee and find it in Employee List', { tag: '@q2
 
       const rows = employeeListPage.table.rows;
       await expect(rows).toHaveCount(1);
-      expect(await employeeListPage.table.readRow(rows.first())).toMatchObject({
+      await expect.poll(() => employeeListPage.table.readRow(rows.first())).toMatchObject({
         Id: employee.employeeId,
         'First (& Middle) Name': `${employee.firstName} ${employee.middleName}`,
         'Last Name': employee.lastName,
