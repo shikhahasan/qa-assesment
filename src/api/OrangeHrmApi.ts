@@ -7,10 +7,22 @@ interface Employee {
   middleName: string;
   lastName: string;
 }
+interface SystemUser {
+  id: number;
+  userName: string;
+  status: boolean;
+  userRole: { id: number; name: string };
+  employee: Employee;
+}
 
+/**
+ * Thin client over OrangeHRM's REST API (/api/v2). Used ONLY for test-data setup and cleanup,
+ * so UI tests don't depend on data other demo users may have changed or deleted.
+ */
 export class OrangeHrmApi {
   constructor(private readonly request: APIRequestContext) {}
 
+  /** Session login the same way the browser does: CSRF token from the login page, then POST the form. */
   async login(username: string, password: string) {
     const html = await (await this.request.get('auth/login')).text();
     const token = html.match(/:token="&quot;([^&]+)&quot;"/)?.[1];
@@ -36,5 +48,19 @@ export class OrangeHrmApi {
 
   async deleteEmployees(empNumbers: number[]) {
     await this.call('DELETE', 'pim/employees', { data: { ids: empNumbers } });
+  }
+
+  // ---- Admin ----
+  async createSystemUser(u: { username: string; password: string; empNumber: number; role: 'Admin' | 'ESS'; enabled: boolean }) {
+    const data = { username: u.username, password: u.password, empNumber: u.empNumber, userRoleId: u.role === 'Admin' ? 1 : 2, status: u.enabled };
+    return (await this.call<{ data: SystemUser }>('POST', 'admin/users', { data })).data;
+  }
+
+  async getSystemUser(id: number) {
+    return (await this.call<{ data: SystemUser }>('GET', `admin/users/${id}`)).data;
+  }
+
+  async deleteSystemUsers(ids: number[]) {
+    await this.call('DELETE', 'admin/users', { data: { ids } });
   }
 }

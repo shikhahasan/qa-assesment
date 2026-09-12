@@ -22,5 +22,12 @@ export function newEmployee(): NewEmployee {
   };
 }
 
+export function newSystemUser() {
+  return {
+    username: `qa_${faker.string.alphanumeric(8).toLowerCase()}`,
+    password: `Qa@${faker.string.alphanumeric(8)}1`,
+  };
+}
+
 export const invalidUsername = () => `nouser_${faker.string.alphanumeric(6)}`;
 export const invalidPassword = () => faker.internet.password({ length: 12 });
