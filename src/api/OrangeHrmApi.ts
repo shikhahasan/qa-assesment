@@ -14,6 +14,15 @@ interface SystemUser {
   userRole: { id: number; name: string };
   employee: Employee;
 }
+interface LeaveType {
+  id: number;
+  name: string;
+  deleted: boolean;
+}
+interface LeavePeriod {
+  startDate: string;
+  endDate: string;
+}
 
 /**
  * Thin client over OrangeHRM's REST API (/api/v2). Used ONLY for test-data setup and cleanup,
@@ -62,5 +71,35 @@ export class OrangeHrmApi {
 
   async deleteSystemUsers(ids: number[]) {
     await this.call('DELETE', 'admin/users', { data: { ids } });
+  }
+
+  // ---- Leave ----
+  async currentLeavePeriod() {
+    return (await this.call<{ meta: { currentLeavePeriod: LeavePeriod } }>('GET', 'leave/leave-periods')).meta.currentLeavePeriod;
+  }
+
+  async leaveType(preferredName: string) {
+    const types = (await this.call<{ data: LeaveType[] }>('GET', 'leave/leave-types', { params: { limit: 0 } })).data;
+    const active = types.filter((t) => !t.deleted);
+    const type = active.find((t) => t.name === preferredName) ?? active[0];
+    if (!type) throw new Error('No active leave types configured');
+    return type;
+  }
+
+  async myLeaveBalance(leaveTypeId: number) {
+    const res = await this.call<{ data: { balance: { balance: number } }; meta: { employee: Employee } }>(
+      'GET',
+      `leave/leave-balance/leave-type/${leaveTypeId}`,
+    );
+    return { balance: res.data.balance.balance, empNumber: res.meta.employee.empNumber };
+  }
+
+  async addLeaveEntitlement(e: { empNumber: number; leaveTypeId: number; period: LeavePeriod; days: number }) {
+    const data = { empNumber: e.empNumber, leaveTypeId: e.leaveTypeId, fromDate: e.period.startDate, toDate: e.period.endDate, entitlement: String(e.days) };
+    return (await this.call<{ data: { id: number } }>('POST', 'leave/leave-entitlements', { data })).data;
+  }
+
+  async deleteLeaveEntitlements(ids: number[]) {
+    await this.call('DELETE', 'leave/leave-entitlements', { data: { ids } });
   }
 }

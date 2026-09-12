@@ -31,3 +31,4 @@ export function newSystemUser() {
 
 export const invalidUsername = () => `nouser_${faker.string.alphanumeric(6)}`;
 export const invalidPassword = () => faker.internet.password({ length: 12 });
+export const uniqueTag = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${faker.string.alphanumeric(4)}`;

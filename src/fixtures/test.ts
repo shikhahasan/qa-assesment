@@ -5,6 +5,8 @@ import { TopBar } from '../components/TopBar';
 import { env } from '../config/env';
 import { EditUserPage } from '../pages/admin/EditUserPage';
 import { SystemUsersPage } from '../pages/admin/SystemUsersPage';
+import { ApplyLeavePage } from '../pages/leave/ApplyLeavePage';
+import { MyLeavePage } from '../pages/leave/MyLeavePage';
 import { LoginPage } from '../pages/LoginPage';
 import { AddEmployeePage } from '../pages/pim/AddEmployeePage';
 import { EmployeeListPage } from '../pages/pim/EmployeeListPage';
@@ -17,7 +19,8 @@ interface Fixtures {
   addEmployeePage: AddEmployeePage;
   systemUsersPage: SystemUsersPage;
   editUserPage: EditUserPage;
-  /** Admin-authenticated API client (own session, independent of the browser). */
+  applyLeavePage: ApplyLeavePage;
+  myLeavePage: MyLeavePage;
   api: OrangeHrmApi;
 }
 
@@ -29,6 +32,8 @@ export const test = base.extend<Fixtures>({
   addEmployeePage: async ({ page }, use) => use(new AddEmployeePage(page)),
   systemUsersPage: async ({ page }, use) => use(new SystemUsersPage(page)),
   editUserPage: async ({ page }, use) => use(new EditUserPage(page)),
+  applyLeavePage: async ({ page }, use) => use(new ApplyLeavePage(page)),
+  myLeavePage: async ({ page }, use) => use(new MyLeavePage(page)),
 
   api: async ({ playwright }, use) => {
     const request = await playwright.request.newContext({ baseURL: env.baseURL });
