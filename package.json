@@ -1,0 +1,26 @@
+{
+  "name": "qa-assignment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:q1": "playwright test --grep @q1",
+    "test:q2": "playwright test --grep @q2",
+    "test:q3": "playwright test --grep @q3",
+    "test:q4": "playwright test --grep @q4",
+    "test:headed": "playwright test --headed",
+    "report:html": "playwright show-report playwright-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.2",
+    "typescript": "^7.0.2"
+  }
+}
